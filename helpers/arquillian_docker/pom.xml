@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2018 Dematic, Corp.
+  ~ Licensed under the MIT Open Source License: https://opensource.org/licenses/MIT
+  -->
+
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.dematic.labs.toolkit.buildProcess</groupId>
+        <artifactId>parentPom</artifactId>
+        <version>2.3.2-SNAPSHOT</version>
+        <relativePath>../../buildProcess/parentPom/pom.xml</relativePath>
+    </parent>
+
+    <groupId>com.dematic.labs.toolkit.helpers</groupId>
+    <artifactId>arquillian_docker</artifactId>
+    <name>toolkit/helpers/arquillian_docker</name>
+    <description>Arquillian extension to set the port to a value selected by the docker plugin.</description>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.dematic.labs.toolkit.bom</groupId>
+                <artifactId>common-dep</artifactId>
+                <version>2.3.2-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.core</groupId>
+            <artifactId>arquillian-core-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.dematic.labs.toolkit.helpers</groupId>
+            <artifactId>test_util</artifactId>
+            <version>2.3.2-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+</project>
