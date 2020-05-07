@@ -238,6 +238,7 @@
                         </goals>
                         <phase>initialize</phase>
                         <configuration>
+                            <quiet>true</quiet>
                             <files>
                                 <file>${user.home}/.m2/junit.properties</file>
                             </files>
