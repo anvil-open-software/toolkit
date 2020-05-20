@@ -3,4 +3,5 @@
 *.iml
 #maven
 target/
+.flattened-pom.xml
 derby.log

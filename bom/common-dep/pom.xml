@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.dematic.labs</groupId>
         <artifactId>toolkit</artifactId>
-        <version>2.3.2-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -30,17 +30,17 @@
             <dependency>
                 <groupId>com.dematic.labs.toolkit.buildProcess</groupId>
                 <artifactId>jacocoListener</artifactId>
-                <version>2.3.2-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.dematic.labs.toolkit.helpers</groupId>
                 <artifactId>arquillian_docker</artifactId>
-                <version>2.3.2-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.dematic.labs.toolkit.helpers</groupId>
                 <artifactId>test_util</artifactId>
-                <version>2.3.2-SNAPSHOT</version>
+                <version>${revision}</version>
             </dependency>
             <!-- container -->
             <dependency>
