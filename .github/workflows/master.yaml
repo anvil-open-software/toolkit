@@ -1,4 +1,4 @@
-name: Branch CI
+name: Master/Pull-Request CI
 on:
     push:
         branches:
