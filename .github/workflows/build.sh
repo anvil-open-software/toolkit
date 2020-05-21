@@ -76,6 +76,8 @@ else
 fi
 
 if is_releasable; then
+    git config --local user.name "github-ci"
+    git config --local user.email "github-ci@anvil-software.com"
     # shellcheck disable=SC2154
     git tag "${tag}" -m "Release ${tag}"
     git push origin "${tag}"
