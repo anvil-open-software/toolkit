@@ -5,18 +5,13 @@
 package com.dematic.labs.toolkit.buildProcess.jacocoListener.remote;
 
 import org.jacoco.core.runtime.AgentOptions;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 public class AddressTest {
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void defaultAddressShouldBeLocalhost() {
         assertEquals(Address.DEFAULT_HOST, Address.DEFAULT_ADDRESS.getHost());
@@ -25,28 +20,26 @@ public class AddressTest {
 
     @Test
     public void emptyStringShouldFail() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Invalid agent address syntax");
-        new Address("");
+        final var e = assertThrows(IllegalArgumentException.class, () -> new Address(""));
+        assertEquals("Invalid agent address syntax \"\".", e.getMessage());
     }
 
     @Test
     public void portWithoutColonShouldFail() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Invalid agent address syntax");
-        new Address("4500");
+        final var e = assertThrows(IllegalArgumentException.class, () -> new Address("4500"));
+        assertEquals("Invalid agent address syntax \"4500\".", e.getMessage());
     }
 
     @Test
     public void portOnlyShouldDefaultToDefaultHost() {
-        final Address address = new Address(":4500");
+        final var address = new Address(":4500");
         assertEquals(Address.DEFAULT_HOST, address.getHost());
         assertEquals(4500, address.getPort());
     }
 
     @Test
     public void hostAndPortShouldParse() {
-        final Address address = new Address("fancy.host.name:4500");
+        final var address = new Address("fancy.host.name:4500");
         assertEquals("fancy.host.name", address.getHost());
         assertEquals(4500, address.getPort());
     }

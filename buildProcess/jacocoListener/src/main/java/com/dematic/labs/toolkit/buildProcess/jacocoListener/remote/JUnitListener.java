@@ -5,25 +5,24 @@
 package com.dematic.labs.toolkit.buildProcess.jacocoListener.remote;
 
 
-import org.junit.runner.Description;
-import org.junit.runner.notification.RunListener;
-
-import javax.annotation.Nonnull;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 /**
  * JUnit listener that instructs JaCoCo to create one session per test.
  */
-public class JUnitListener extends RunListener {
+public class JUnitListener implements AfterTestExecutionCallback, BeforeTestExecutionCallback {
 
-    private JacocoController jacoco = new JacocoController();
+    private final JacocoController jacoco = new JacocoController();
 
     @Override
-    public void testStarted(@Nonnull final Description description) {
+    public void beforeTestExecution(final ExtensionContext context) {
         jacoco.onTestStart();
     }
 
     @Override
-    public void testFinished(@Nonnull final Description description) {
+    public void afterTestExecution(final ExtensionContext context) {
         jacoco.onTestFinish();
     }
 }

@@ -9,7 +9,7 @@
 
     <groupId>com.dematic.labs</groupId>
     <artifactId>toolkit</artifactId>
-    <version>2.3.2-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -25,12 +25,12 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jacoco.version>0.7.9</jacoco.version>
         <liquibase.version>3.5.3</liquibase.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <build>
-        <defaultGoal>clean install</defaultGoal>
+        <defaultGoal>clean verify</defaultGoal>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -41,7 +41,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <compilerArgs>
                             <arg>-parameters</arg>
@@ -83,12 +83,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>3.0.0-M4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>3.0.0-M4</version>
                     <executions>
                         <execution>
                             <goals>
@@ -145,11 +145,35 @@
                         <generateBackupPoms>false</generateBackupPoms>
                     </configuration>
                 </plugin>
-
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.2.2</version>
+                    <configuration>
+                        <updatePomFile>true</updatePomFile>
+                        <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                            <phase>process-resources</phase>
+                        </execution>
+                        <execution>
+                            <id>flatten.clean</id>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                            <phase>clean</phase>
+                        </execution>
+                    </executions>
+                </plugin>
                 <plugin>
                     <groupId>io.fabric8</groupId>
                     <artifactId>docker-maven-plugin</artifactId>
-                    <version>0.26.0</version>
+                    <version>0.33.0</version>
                     <configuration>
                         <portPropertyFile>${project.build.directory}/ports.properties</portPropertyFile>
                         <showLogs>true</showLogs>
@@ -167,7 +191,7 @@
                             <configuration>
                                 <images>
                                     <image>
-                                        <name>us.gcr.io/dlabs-dev-primary/%a:%v</name>
+                                        <name>%a:%v</name>
                                         <build>
                                             <tags>latest</tags>
                                             <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
@@ -194,12 +218,12 @@
                         </goals>
                         <configuration>
                             <rules>
-                                <banDistributionManagement />
+                                <banDistributionManagement/>
                                 <requireJavaVersion>
-                                    <version>[1.8.0,)</version>
+                                    <version>[1.11.0,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>[3.5.0,)</version>
+                                    <version>[3.6.0,)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>
@@ -257,6 +281,10 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
@@ -290,6 +318,82 @@
             <properties>
                 <skipITs>true</skipITs>
             </properties>
+        </profile>
+        <profile>
+            <id>releaseValidation</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>enforce-no-snapshots</id>
+                                <goals>
+                                    <goal>enforce</goal>
+                                </goals>
+                                <configuration>
+                                    <rules>
+                                        <requireReleaseDeps>
+                                            <message>This build will be released, snapshots dependencies are not
+                                                allowed!
+                                            </message>
+                                        </requireReleaseDeps>
+                                    </rules>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>changelog</id>
+            <activation>
+                <file>
+                    <exists>CHANGELOG.md</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <configuration>
+                            <skipBuild>true</skipBuild>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>validate-changelog</id>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <images>
+                                        <image>
+                                            <name>denisa/clq</name>
+                                            <run>
+                                                <cmd>
+                                                    <arg>/home/CHANGELOG.md</arg>
+                                                </cmd>
+                                                <volumes>
+                                                    <bind>
+                                                        <volume>${project.basedir}:/home/:ro</volume>
+                                                    </bind>
+                                                </volumes>
+                                                <wait>
+                                                    <exit>0</exit>
+                                                </wait>
+                                            </run>
+                                        </image>
+                                    </images>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

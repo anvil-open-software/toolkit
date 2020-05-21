@@ -10,7 +10,7 @@
     <parent>
         <groupId>com.dematic.labs</groupId>
         <artifactId>toolkit</artifactId>
-        <version>2.3.2-SNAPSHOT</version>
+        <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -24,7 +24,7 @@
             <dependency>
                 <groupId>com.dematic.labs.toolkit.bom</groupId>
                 <artifactId>common-dep</artifactId>
-                <version>2.3.2-SNAPSHOT</version>
+                <version>${revision}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -41,13 +41,13 @@
             <artifactId>org.jacoco.core</artifactId>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-junit</artifactId>
+            <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

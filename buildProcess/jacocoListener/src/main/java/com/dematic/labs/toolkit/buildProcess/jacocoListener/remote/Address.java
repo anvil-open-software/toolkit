@@ -26,7 +26,7 @@ public class Address {
     }
 
     public Address(@Nonnull final String address) {
-        final int pos = address.indexOf(':');
+        final var pos = address.indexOf(':');
         if (pos == -1) {
             throw new IllegalArgumentException(format("Invalid agent address syntax \"%s\".", address));
         }
@@ -49,14 +49,14 @@ public class Address {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(@Nullable final Object o) {
         if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        final Address address = (Address) o;
+        final var address = (Address) o;
         return port == address.port && Objects.equals(host, address.host);
     }
 

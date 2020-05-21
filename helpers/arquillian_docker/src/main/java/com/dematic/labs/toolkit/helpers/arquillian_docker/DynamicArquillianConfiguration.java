@@ -6,9 +6,6 @@
 package com.dematic.labs.toolkit.helpers.arquillian_docker;
 
 import com.dematic.labs.toolkit.helpers.test_util.DockerHelper;
-import org.jboss.arquillian.config.descriptor.api.ContainerDef;
-import org.jboss.arquillian.config.descriptor.api.ProtocolDef;
-import org.jboss.arquillian.container.spi.Container;
 import org.jboss.arquillian.container.spi.ContainerRegistry;
 import org.jboss.arquillian.container.spi.client.protocol.ProtocolDescription;
 import org.jboss.arquillian.core.api.annotation.Observes;
@@ -19,7 +16,7 @@ import javax.annotation.Nonnull;
 
 public class DynamicArquillianConfiguration implements LoadableExtension {
     @Override
-    public void register(LoadableExtension.ExtensionBuilder builder) {
+    public void register(final LoadableExtension.ExtensionBuilder builder) {
         builder.observer(LoadContainerConfiguration.class);
     }
 
@@ -30,12 +27,12 @@ public class DynamicArquillianConfiguration implements LoadableExtension {
          * @param registry      contains containers defined in arquillian.xml
          * @param serviceLoader
          */
-        public void registerInstance(@Observes @Nonnull final ContainerRegistry registry, ServiceLoader serviceLoader) {
-            final Container arquillianContainer = registry.getContainers().iterator().next();
-            ContainerDef containerConfiguration = arquillianContainer.getContainerConfiguration();
+        public void registerInstance(@Observes @Nonnull final ContainerRegistry registry, final ServiceLoader serviceLoader) {
+            final var arquillianContainer = registry.getContainers().iterator().next();
+            final var containerConfiguration = arquillianContainer.getContainerConfiguration();
             containerConfiguration.property("managementPort", DockerHelper.getPort("container.configuration.managementPort"));
 
-            final ProtocolDef protocolConfiguration = arquillianContainer.getProtocolConfiguration(new ProtocolDescription("Servlet 3.0"));
+            final var protocolConfiguration = arquillianContainer.getProtocolConfiguration(new ProtocolDescription("Servlet 3.0"));
             protocolConfiguration.property("port", DockerHelper.getPort("servlet.port"));
         }
     }

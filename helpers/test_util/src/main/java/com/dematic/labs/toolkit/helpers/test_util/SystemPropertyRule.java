@@ -5,12 +5,13 @@
 
 package com.dematic.labs.toolkit.helpers.test_util;
 
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -25,16 +26,19 @@ import static java.nio.file.Paths.get;
 /**
  * load system properties from the junit.properties file
  */
-public final class SystemPropertyRule extends ExternalResource {
+public final class SystemPropertyRule implements AfterTestExecutionCallback, BeforeTestExecutionCallback {
     private final Map<String, String> previousValues = new HashMap<>();
 
     @Override
-    protected void before() throws IOException {
-        final Path junitPropertiesPath = get(getProperty("user.home"), ".m2", "junit.properties");
-        try (final InputStream inputStream = newInputStream(junitPropertiesPath)) {
-            final Properties junitProperties = new Properties();
+    public void beforeTestExecution(final ExtensionContext context) throws IOException {
+        final var junitPropertiesPath = get(getProperty("user.home"), ".m2", "junit.properties");
+        if (!Files.exists(junitPropertiesPath)) {
+            return;
+        }
+        try (final var inputStream = newInputStream(junitPropertiesPath)) {
+            final var junitProperties = new Properties();
             junitProperties.load(inputStream);
-            for (final String propertyKey : junitProperties.stringPropertyNames()) {
+            for (final var propertyKey : junitProperties.stringPropertyNames()) {
                 if (propertyKey.startsWith("nexus")) {
                     continue;
                 }
@@ -48,8 +52,8 @@ public final class SystemPropertyRule extends ExternalResource {
     }
 
     @Override
-    protected void after() {
-        for (final Map.Entry<String, String> property : previousValues.entrySet()) {
+    public void afterTestExecution(final ExtensionContext context) {
+        for (final var property : previousValues.entrySet()) {
             if (property.getValue() == null) {
                 clearProperty(property.getKey());
             } else {
@@ -57,4 +61,5 @@ public final class SystemPropertyRule extends ExternalResource {
             }
         }
     }
+
 }
