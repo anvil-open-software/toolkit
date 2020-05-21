@@ -15,7 +15,7 @@ jobs:
                 uses: actions/setup-java@v1
                 with:
                     java-version: 1.8
-            -   run: .github/build.sh
+            -   run: .github/worflows/build.sh
                 env:
                     GH_EVENT_NAME: ${{ github.event_name }}
                     GH_REF: ${{ github.ref }}
