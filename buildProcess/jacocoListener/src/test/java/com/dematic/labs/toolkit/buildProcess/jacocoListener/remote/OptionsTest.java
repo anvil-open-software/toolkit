@@ -5,34 +5,28 @@
 package com.dematic.labs.toolkit.buildProcess.jacocoListener.remote;
 
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class OptionsTest {
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void creatorShouldRejectIrregularFormat() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Invalid agent option syntax");
-        new Options("destfile,append");
+        final var e = assertThrows(IllegalArgumentException.class, () -> new Options("destfile,append"));
+        assertEquals("Invalid agent option syntax \"destfile,append\".", e.getMessage());
     }
 
     @Test
     public void creatorShouldRejectUnknownOptions() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("Unknown agent option");
-        new Options("foo=42");
+        final var e = assertThrows(IllegalArgumentException.class, () -> new Options("foo=42"));
+        assertEquals("Unknown agent option \"foo\".", e.getMessage());
     }
 
     @Test
@@ -73,25 +67,25 @@ public class OptionsTest {
     @Test
     public void defaultAddressesShouldBeLocal() {
         assertThat(new Options("").getAddresses(),
-                contains(Address.DEFAULT_ADDRESS));
+            contains(Address.DEFAULT_ADDRESS));
     }
 
     @Test
     public void aAddressesShouldRecognizeSingleEntry() {
         assertThat(new Options("addresses=host1:32456").getAddresses(),
-                contains(new Address("host1:32456")));
+            contains(new Address("host1:32456")));
     }
 
     @Test
     public void addressesShouldRecognizeList() {
         assertThat(new Options("addresses=host1:32456,:9876,host2:9876").getAddresses(),
-                containsInAnyOrder(new Address("host1:32456"), new Address(":9876"), new Address("host2:9876")));
+            containsInAnyOrder(new Address("host1:32456"), new Address(":9876"), new Address("host2:9876")));
     }
 
     @Test
-    public void toStringShouldShowAllFields(){
+    public void toStringShouldShowAllFields() {
         assertEquals("addresses=localhost:9876,host1:32456,append=false,destfile=/var/foo",
-                new Options("addresses=host1:32456,:9876,destfile=/var/foo,append=false").toString());
+            new Options("addresses=host1:32456,:9876,destfile=/var/foo,append=false").toString());
     }
 
 }

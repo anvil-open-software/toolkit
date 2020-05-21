@@ -15,16 +15,18 @@ import ch.qos.logback.core.read.ListAppender;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.TypeSafeMatcher;
-import org.junit.Assert;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
+import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleLogAssertion extends ExternalResource {
+public class SimpleLogAssertion implements AfterTestExecutionCallback, BeforeTestExecutionCallback {
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SimpleLogAssertion.class);
     private final ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 
@@ -35,15 +37,15 @@ public class SimpleLogAssertion extends ExternalResource {
     private Level level = Level.TRACE;
 
     @Override
-    protected void before() {
-        for (final Class<?> logSource : loggingSources) {
+    public void beforeTestExecution(final ExtensionContext context) {
+        for (final var logSource : loggingSources) {
             addAppenderToType(logSource);
         }
         listAppender.start();
     }
 
     @Override
-    protected void after() {
+    public void afterTestExecution(final ExtensionContext context) {
         listAppender.stop();
         lc.reset();
         try {
@@ -61,7 +63,7 @@ public class SimpleLogAssertion extends ExternalResource {
 
     @Nonnull
     public SimpleLogAssertion recordFor(@Nonnull final Class<?>... types) {
-        for (final Class<?> type : types) {
+        for (final var type : types) {
             loggingSources.add(type);
             addAppenderToType(type);
         }
@@ -69,7 +71,7 @@ public class SimpleLogAssertion extends ExternalResource {
     }
 
     public void assertThat(@Nonnull final Matcher<String> matcher) {
-        Assert.assertThat(listAppender.list, CoreMatchers.hasItem(new TypeSafeMatcher<ILoggingEvent>() {
+        MatcherAssert.assertThat(listAppender.list, CoreMatchers.hasItem(new TypeSafeMatcher<ILoggingEvent>() {
             @Override
             protected boolean matchesSafely(@Nonnull final ILoggingEvent item) {
                 return matcher.matches(item.getFormattedMessage());
@@ -87,7 +89,7 @@ public class SimpleLogAssertion extends ExternalResource {
     }
 
     private void addAppenderToType(@Nonnull final Class<?> type) {
-        final Logger logger = (Logger) LoggerFactory.getLogger(type);
+        final var logger = (Logger) LoggerFactory.getLogger(type);
         logger.addAppender(listAppender);
         logger.setLevel(level);
     }

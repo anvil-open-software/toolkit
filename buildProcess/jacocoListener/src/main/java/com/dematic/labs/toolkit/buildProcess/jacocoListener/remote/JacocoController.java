@@ -5,7 +5,6 @@
 package com.dematic.labs.toolkit.buildProcess.jacocoListener.remote;
 
 import org.jacoco.core.tools.ExecDumpClient;
-import org.jacoco.core.tools.ExecFileLoader;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,16 +30,16 @@ public class JacocoController {
         testStarted = false;
     }
 
-    private void dump() {
-        final Options agentOptions = new Options(getProperty("com.dematic.labs.toolkit.buildProcess.jacocoListener.remote.agent"));
-        final ExecDumpClient client = new ExecDumpClient();
+    private static void dump() {
+        final var agentOptions = new Options(getProperty("com.dematic.labs.toolkit.buildProcess.jacocoListener.remote.agent"));
+        final var client = new ExecDumpClient();
         client.setReset(true);
         try {
-            for (Address address : agentOptions.getAddresses()) {
-                final ExecFileLoader dump = client.dump(address.getHost(), address.getPort());
+            for (final var address : agentOptions.getAddresses()) {
+                final var dump = client.dump(address.getHost(), address.getPort());
                 dump.save(new File(agentOptions.getDestfile()), agentOptions.getAppend());
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new JacocoControllerError(e);
         }
     }

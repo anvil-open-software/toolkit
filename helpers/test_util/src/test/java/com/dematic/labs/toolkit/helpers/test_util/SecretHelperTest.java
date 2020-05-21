@@ -5,16 +5,14 @@
 
 package com.dematic.labs.toolkit.helpers.test_util;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SecretHelperTest {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void existingSecretCanBeRead() {
@@ -23,8 +21,7 @@ public class SecretHelperTest {
 
     @Test
     public void missingSecretFailToRead() {
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage(endsWith("src/test/docker/secrets/MISSING_SECRET"));
-        SecretHelper.getSecret("MISSING_SECRET");
+        final var e = assertThrows(IllegalArgumentException.class, () -> SecretHelper.getSecret("MISSING_SECRET"));
+        assertThat(e.getMessage(), endsWith("src/test/docker/secrets/MISSING_SECRET"));
     }
 }

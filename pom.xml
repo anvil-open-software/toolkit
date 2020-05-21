@@ -25,8 +25,8 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <jacoco.version>0.7.9</jacoco.version>
         <liquibase.version>3.5.3</liquibase.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <build>
@@ -41,7 +41,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.8.1</version>
                     <configuration>
                         <compilerArgs>
                             <arg>-parameters</arg>
@@ -83,12 +83,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>3.0.0-M4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>2.21.0</version>
+                    <version>3.0.0-M4</version>
                     <executions>
                         <execution>
                             <goals>
@@ -220,10 +220,10 @@
                             <rules>
                                 <banDistributionManagement/>
                                 <requireJavaVersion>
-                                    <version>[1.8.0,)</version>
+                                    <version>[1.11.0,)</version>
                                 </requireJavaVersion>
                                 <requireMavenVersion>
-                                    <version>[3.5.0,)</version>
+                                    <version>[3.6.0,)</version>
                                 </requireMavenVersion>
                             </rules>
                         </configuration>

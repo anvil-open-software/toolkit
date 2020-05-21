@@ -1,19 +1,25 @@
 # Changelog
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+[![Keep a Changelog](https://img.shields.io/badge/Keep%20a%20Changelog-1.0.0-informational)](https://keepachangelog.com/en/1.0.0/)
+[![Semantic Versioning](https://img.shields.io/badge/Sematic%20Versioning-2.0.0-informational)](https://semver.org/spec/v2.0.0.html)
+![clq validated](https://img.shields.io/badge/clq-validated-success)
 
 Keep the newest entry at top, format date according to ISO 8601: `YYYY-MM-DD`.
-Categories:
-- major release trigger
-   - _Added_ for new features.
-   - _Removed_ for now removed features.
-- minor release trigger
-   - _Changed_ for changes in existing functionality.
-   - _Deprecated_ for soon-to-be removed features.
-- bug-fix release trigger
-   - _Fixed_ for any bug fixes.
-   - _Security_ in case of vulnerabilities.
 
-## [3.0.0] - 2020-05-20
+Categories:
+- _major_ release trigger:
+   - `Added` for new features.
+   - `Removed` for now removed features.
+- _minor_ release trigger:
+   - `Changed` for changes in existing functionality.
+   - `Deprecated` for soon-to-be removed features.
+- _bug-fix_ release trigger:
+   - `Fixed` for any bug fixes.
+   - `Security` in case of vulnerabilities.
+
+## [3.0.0] - 2020-05-21
 ### Added
 - changelog
+### Removed
+- support for java older than 11
+- support for junit 4 and previous
+

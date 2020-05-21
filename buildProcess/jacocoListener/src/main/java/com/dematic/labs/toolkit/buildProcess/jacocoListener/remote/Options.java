@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.joining;
@@ -40,19 +42,19 @@ public class Options {
             return;
         }
 
-        for (final String entry : OPTION_SPLIT.split(optionstr)) {
-            final int pos = entry.indexOf('=');
+        for (final var entry : OPTION_SPLIT.split(optionstr)) {
+            final var pos = entry.indexOf('=');
             if (pos == -1) {
                 throw new IllegalArgumentException(format("Invalid agent option syntax \"%s\".", optionstr));
             }
-            final String key = entry.substring(0, pos);
+            final var key = entry.substring(0, pos);
             if (!VALID_OPTIONS.contains(key)) {
                 throw new IllegalArgumentException(format("Unknown agent option \"%s\".", key));
             }
 
-            final String value = entry.substring(pos + 1);
+            final var value = entry.substring(pos + 1);
             if (ADDRESSES.equals(key)) {
-                for (final String address : COMMA_SPLIT.split(value)) {
+                for (final var address : COMMA_SPLIT.split(value)) {
                     addresses.add(new Address(address));
                 }
             } else {
@@ -67,7 +69,7 @@ public class Options {
      * @return <code>true</code>, when the output should be appended
      */
     public boolean getAppend() {
-        return getOption(APPEND, true);
+        return parseBoolean(options.getOrDefault(APPEND, TRUE.toString()));
     }
 
     /**
@@ -80,18 +82,13 @@ public class Options {
         return options.getOrDefault(DESTFILE, AgentOptions.DEFAULT_DESTFILE);
     }
 
-    private boolean getOption(@Nonnull final String key, final boolean defaultValue) {
-        final String value = options.get(key);
-        return value == null ? defaultValue : Boolean.parseBoolean(value);
-    }
-
     public Set<Address> getAddresses() {
         return addresses.isEmpty() ? singleton(Address.DEFAULT_ADDRESS) : addresses;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
+        final var sb = new StringBuilder();
         if (!addresses.isEmpty()) {
             sb
                     .append(ADDRESSES)

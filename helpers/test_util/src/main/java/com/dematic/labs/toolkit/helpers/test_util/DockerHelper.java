@@ -33,8 +33,8 @@ public class DockerHelper {
     }
 
     @Nonnull
-    public static String getPort(@Nonnull String portPropertyName) {
-        final String value = loadDockerProperties().getProperty(portPropertyName);
+    public static String getPort(@Nonnull final String portPropertyName) {
+        final var value = loadDockerProperties().getProperty(portPropertyName);
         if (value == null) {
             throw new IllegalArgumentException("Port " + portPropertyName + " has no defined value");
         }
@@ -43,11 +43,11 @@ public class DockerHelper {
 
     @Nonnull
     public static Properties loadDockerProperties() {
-        final Properties properties = new Properties();
-        try (final FileReader reader = new FileReader(PORTS_PROPERTIES)) {
+        final var properties = new Properties();
+        try (final var reader = new FileReader(PORTS_PROPERTIES)) {
             properties.load(reader);
             return properties;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new IllegalStateException("Error loading port mapping file " + PORTS_PROPERTIES.getAbsolutePath() + ": " + e, e);
         }
     }
@@ -56,7 +56,7 @@ public class DockerHelper {
      * @see #storeDockerProperties(Properties)
      */
     public static void storeDockerProperties(@Nonnull final Map<String, String> map) throws IOException {
-        final Properties properties = new Properties();
+        final var properties = new Properties();
         properties.putAll(map);
         storeDockerProperties(properties);
     }
@@ -68,7 +68,7 @@ public class DockerHelper {
     public static void storeDockerProperties(@Nonnull final Properties properties) throws IOException {
         LOGGER.error("Generating " + PORTS_PROPERTIES.getAbsolutePath());
 
-        try (final FileWriter writer = new FileWriter(PORTS_PROPERTIES)) {
+        try (final var writer = new FileWriter(PORTS_PROPERTIES)) {
             properties.store(writer, "Manually generated at " + now());
         }
     }

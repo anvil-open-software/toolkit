@@ -23,7 +23,7 @@ public class SecretHelper {
 
     @Nonnull
     public static String getSecret(@Nonnull final String name) {
-        final Path path = get(SECRETS_PATH, name);
+        final var path = get(SECRETS_PATH, name);
         try {
             return lines(path).findFirst().orElseThrow(() -> new IllegalArgumentException("Undefined secret " + path));
         } catch (final IOException e) {
