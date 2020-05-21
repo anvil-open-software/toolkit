@@ -44,7 +44,7 @@ function is_publishable() {
 }
 
 function is_releasable() {
-    if ! is_pull_request_build && is_branch_master; then
+    if is_pull_request_build || is_branch_master; then
         echo "✅ Version ${version} can be released"
         return 0
     else
