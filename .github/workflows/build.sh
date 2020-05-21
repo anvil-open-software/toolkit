@@ -81,4 +81,5 @@ if is_releasable; then
     # shellcheck disable=SC2154
     git tag "${tag}" -m "Release ${tag}"
     git push origin "${tag}"
+    echo '::set-env name=TAG::$tag'
 fi
