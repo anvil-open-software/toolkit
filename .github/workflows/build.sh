@@ -3,7 +3,7 @@
 set -eu
 
 function is_branch_master() {
-    if [ "${GH_REF}" == "master" ]; then
+    if [ "${GH_REF}" == "refs/heads/master" ]; then
         echo "✅ Branch is master"
         return 0
     else
