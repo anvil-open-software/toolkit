@@ -7,21 +7,73 @@ on:
             - '*'
     pull_request:
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            -   uses: actions/checkout@v2
-            -   uses: actions/setup-java@v1
-                with:
-                    java-version: 11
-            -   run: .github/workflows/build.sh
-                env:
-                    GH_EVENT_NAME: ${{ github.event_name }}
-                    GH_REF: ${{ github.ref }}
-            -   uses: actions/create-release@v1
-                if: ${{ success() && env.TAG }}
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                with:
-                    tag_name: ${{ env.TAG }}
-                    release_name: Release ${{ env.TAG }}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: denisa/clq-action@v1.0.1
+      id: clq-extract
+      with:
+        mode: feature
+    - id: define-build-kind
+      env:
+        GH_EVENT_NAME: ${{ github.event_name }}
+        GH_REF: ${{ github.ref }}
+        version: ${{ steps.clq-extract.outputs.version }}
+      run: |
+        function is_release_branch() {
+            if [ "${GH_REF}" == "refs/heads/master" ]; then
+                return 0
+            fi
+            return 1
+        }
+        function is_feature_branch_version() {
+          if [[ ${version} =~ '^[0-9]+(\.[0-9]+)+(-[[:alnum:].]+)+$' ]]; then
+            return 0
+          fi
+          return 1
+        }
+        function is_publishable() {
+            if is_release_branch || ( [ "${GH_EVENT_NAME}" == "push" ] && is_feature_branch_version ); then
+                return 0
+            fi
+            return 1
+        }
+        echo "::set-output name=is_release_branch::$(is_release_branch; echo $?)"
+        echo "::set-output name=is_publishable::$(is_publishable; echo $?)"
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - name: maven build
+      env:
+        is_publishable: ${{ steps.define-build-kind.outputs.is_publishable }}
+        version: ${{ steps.clq-extract.outputs.version }}
+      run: |
+        if [ "$is_publishable" -eq 0 ]; then
+          mvn -B --no-transfer-progress -Drevision="${version}" -Pci,releaseValidation install
+        else
+          mvn -B --no-transfer-progress -Drevision="${version}" verify
+        fi
+    - uses: denisa/clq-action@v1.0.1
+      if: steps.define-build-kind.outputs.is_release_branch == 0 || github.event_name == 'pull_request'
+      with:
+         mode: release
+    - name: Validate the tag has not yet been used
+      if: steps.define-build-kind.outputs.is_release_branch == 0 || github.event_name == 'pull_request'
+      env:
+        TAG: ${{ steps.clq-extract.outputs.tag }}
+      run: |
+        if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+          echo "::error ::tag $TAG exists already"
+          exit 1
+        fi
+    - uses: actions/create-release@v1.1.2
+      if: steps.define-build-kind.outputs.is_release_branch == 0 && github.event_name == 'push'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.clq-extract.outputs.tag }}
+        release_name: ${{ steps.clq-extract.outputs.name }}
+        prerelease: ${{ steps.clq-extract.outputs.status == 'prereleased' }}
+        body: ${{ steps.clq-extract.outputs.changes }}
+
