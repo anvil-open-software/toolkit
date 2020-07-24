@@ -7,21 +7,51 @@ on:
             - '*'
     pull_request:
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            -   uses: actions/checkout@v2
-            -   uses: actions/setup-java@v1
-                with:
-                    java-version: 11
-            -   run: .github/workflows/build.sh
-                env:
-                    GH_EVENT_NAME: ${{ github.event_name }}
-                    GH_REF: ${{ github.ref }}
-            -   uses: actions/create-release@v1
-                if: ${{ success() && env.TAG }}
-                env:
-                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                with:
-                    tag_name: ${{ env.TAG }}
-                    release_name: Release ${{ env.TAG }}
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 11
+    - run: .github/workflows/build.sh
+      env:
+        GH_EVENT_NAME: ${{ github.event_name }}
+        GH_REF: ${{ github.ref }}
+    - uses: denisa/clq-action@v1.0.1
+      with:
+        mode: feature
+  validate-release:
+    if: github.event_name == 'pull_request' || github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.3.1
+    - uses: denisa/clq-action@v1.0.1
+      id: clq-extract
+      with:
+         mode: release
+    - name: Validate the tag has not yet been used
+      env:
+        TAG: ${{ steps.clq-extract.outputs.tag }}
+      run: |
+        if git ls-remote --exit-code --tags origin "refs/tags/$TAG" >/dev/null 2>&1; then
+          echo "::error ::tag $TAG exists already"
+          exit 1
+        fi
+  tag:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs: [ build, validate-release ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2.3.1
+    - uses: denisa/clq-action@v1.0.1
+      id: clq-extract
+    - uses: actions/create-release@v1.1.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.clq-extract.outputs.tag }}
+        release_name: ${{ steps.clq-extract.outputs.name }}
+        prerelease: ${{ steps.clq-extract.outputs.status == 'prereleased' }}
+        body: ${{ steps.clq-extract.outputs.changes }}
+

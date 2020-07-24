@@ -16,6 +16,10 @@ Categories:
    - `Fixed` for any bug fixes.
    - `Security` in case of vulnerabilities.
 
+## [3.0.1] - 2020-07-23
+### Fixed
+- extract release info from changelog
+
 ## [3.0.0] - 2020-05-21
 ### Added
 - changelog
