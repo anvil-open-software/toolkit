@@ -21,7 +21,7 @@
     <description>common dependencies for all projects</description>
 
     <properties>
-        <wildfly.version>8.2.0.Final</wildfly.version>
+        <wildfly.version>21.0.1.Final</wildfly.version>
     </properties>
 
     <dependencyManagement>
